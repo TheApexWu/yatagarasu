@@ -6,9 +6,28 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PLIST_DIR="$HOME/Library/LaunchAgents"
-PYTHON="/opt/anaconda3/bin/python3"
+
+# Detect Python (same logic as run.sh)
+if [ -f "$SCRIPT_DIR/.venv/bin/python3" ]; then
+    PYTHON="$SCRIPT_DIR/.venv/bin/python3"
+elif command -v python3 &>/dev/null; then
+    PYTHON="$(command -v python3)"
+else
+    PYTHON="/usr/bin/python3"
+fi
 
 echo "=== Yatagarasu Installer ==="
+echo "Python: $PYTHON"
+
+# Check OS
+if [ "$(uname -s)" != "Darwin" ]; then
+    echo "ERROR: install.sh only supports macOS (launchd)."
+    echo "For Linux, set up a cron job manually:"
+    echo "  30 6  * * * cd $SCRIPT_DIR && bash run.sh full"
+    echo "  30 12 * * * cd $SCRIPT_DIR && bash run.sh light"
+    echo "  30 18 * * * cd $SCRIPT_DIR && bash run.sh light"
+    exit 1
+fi
 
 # 1. Install Python deps
 echo "[1/4] Installing Python dependencies..."
@@ -18,8 +37,8 @@ $PYTHON -m pip install pyyaml --quiet 2>/dev/null || echo "pyyaml already instal
 chmod +x "$SCRIPT_DIR/run.sh"
 chmod +x "$SCRIPT_DIR/yatagarasu.py"
 
-# 3. Create Obsidian digest directory
-DIGEST_DIR="$HOME/Documents/Obsidian Vault/00 - Command Center/Yatagarasu"
+# 3. Create digest directory
+DIGEST_DIR="$SCRIPT_DIR/digests"
 mkdir -p "$DIGEST_DIR"
 echo "[2/4] Digest directory: $DIGEST_DIR"
 

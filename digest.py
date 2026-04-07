@@ -102,8 +102,7 @@ def render(scored_items: list[tuple[FeedItem, int, str, str]], config: dict, swe
 
 def write_digest(content: str, config: dict) -> str:
     """Write digest to configured output directory."""
-    digest_dir = config.get("output", {}).get("digest_dir",
-        "~/Documents/Obsidian Vault/00 - Command Center/Yatagarasu")
+    digest_dir = config.get("output", {}).get("digest_dir", "./digests")
     digest_dir = os.path.expanduser(digest_dir)
     os.makedirs(digest_dir, exist_ok=True)
 

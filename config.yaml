@@ -15,7 +15,7 @@ schedule:
   evening: "18:30"      # Light sweep: catch anything missed
 
 output:
-  digest_dir: "~/Documents/Obsidian Vault/00 - Command Center/Yatagarasu"
+  digest_dir: "~/Documents/Obsidian Vault/00 - Command Center/Yatagarasu"  # personal path, yours will differ
   format: "markdown"
 
 # ---- WHO ARE YOU? ----

@@ -82,38 +82,53 @@ def score_items(items: list[FeedItem], config: dict) -> list[tuple[FeedItem, int
             "messages": [{"role": "user", "content": f"Score these items:\n\n{items_text}"}],
         }).encode()
 
-        try:
-            req = urllib.request.Request(ANTHROPIC_API, data=payload, headers={
-                "Content-Type": "application/json",
-                "x-api-key": api_key,
-                "anthropic-version": "2023-06-01",
-            })
-            with urllib.request.urlopen(req, timeout=60) as resp:
-                result = json.loads(resp.read())
+        batch_scored = False
+        for attempt in range(3):
+            try:
+                req = urllib.request.Request(ANTHROPIC_API, data=payload, headers={
+                    "Content-Type": "application/json",
+                    "x-api-key": api_key,
+                    "anthropic-version": "2023-06-01",
+                })
+                with urllib.request.urlopen(req, timeout=60) as resp:
+                    result = json.loads(resp.read())
 
-            text = ""
-            for block in result.get("content", []):
-                if block.get("type") == "text":
-                    text += block["text"]
+                text = ""
+                for block in result.get("content", []):
+                    if block.get("type") == "text":
+                        text += block["text"]
 
-            start = text.find("[")
-            end = text.rfind("]") + 1
-            if start >= 0 and end > start:
-                scores_data = json.loads(text[start:end])
-                score_map = {s["idx"]: s for s in scores_data}
+                start = text.find('[{"')
+                if start < 0:
+                    start = text.find("[")
+                end = text.rfind("]") + 1
+                if start >= 0 and end > start:
+                    scores_data = json.loads(text[start:end])
+                    score_map = {s["idx"]: s for s in scores_data}
 
-                for j, item in enumerate(batch):
-                    if j in score_map:
-                        s = score_map[j]
-                        scored.append((item, s["score"], s.get("tier", "YELLOW"), s.get("why", "")))
-                    else:
-                        scored.append((item, 2, "YELLOW", "unscored"))
-            else:
-                print("[scorer] could not parse JSON from response")
-                scored.extend((item, 2, "YELLOW", "parse error") for item in batch)
+                    for j, item in enumerate(batch):
+                        if j in score_map:
+                            s = score_map[j]
+                            scored.append((item, s["score"], s.get("tier", "YELLOW"), s.get("why", "")))
+                        else:
+                            scored.append((item, 2, "YELLOW", "unscored"))
+                    batch_scored = True
+                    break
+                else:
+                    print(f"[scorer] could not parse JSON (attempt {attempt + 1}/3)")
+                    print(f"[scorer] response preview: {text[:200]}")
+                    if attempt < 2:
+                        import time
+                        time.sleep(2 ** attempt)
 
-        except Exception as e:
-            print(f"[scorer] API error: {e}")
-            scored.extend((item, 2, "YELLOW", f"error: {e}") for item in batch)
+            except Exception as e:
+                print(f"[scorer] API error (attempt {attempt + 1}/3): {e}")
+                if attempt < 2:
+                    import time
+                    time.sleep(2 ** attempt)
+
+        if not batch_scored:
+            print(f"[scorer] batch {i//batch_size + 1} failed after 3 attempts, marking as unscored")
+            scored.extend((item, 2, "YELLOW", "scoring failed") for item in batch)
 
     return scored

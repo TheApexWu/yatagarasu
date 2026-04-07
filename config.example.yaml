@@ -1,0 +1,134 @@
+# Yatagarasu - Signal Curation System
+# Copy this to config.yaml and customize for your interests.
+#
+# QUICK START:
+# 1. Edit 'profile' to describe yourself and your projects
+# 2. Edit 'domains' with keywords that matter to you
+# 3. Edit 'sources' to add/remove feeds
+# 4. Copy .env.example to .env and add your API keys
+# 5. Run: python yatagarasu.py --dry-run
+
+schedule:
+  morning: "06:30"
+  midday: "12:30"
+  evening: "18:30"
+
+output:
+  digest_dir: "./digests"
+  format: "markdown"
+
+# ---- WHO ARE YOU? ----
+# This drives LLM scoring. Be specific about your work.
+profile:
+  description: "a software engineer working on distributed systems and ML infrastructure"
+  projects:
+    - "Building a real-time data pipeline for user behavior analytics"
+    - "Contributing to an open-source ML framework"
+    - "Exploring LLM-based code review tools"
+  noise_patterns:
+    - "Benchmark leaderboard drama (unless top-3 shift)"
+    - "AI doomer/accelerationist culture war"
+    - "Celebrity tech takes"
+    - "Generic 'AI will change everything' articles"
+
+scoring:
+  model: "claude-haiku-4-5-20251001"
+  min_score: 3
+  batch_size: 40
+  tier_budgets:
+    RED: 3
+    ORANGE: 8
+    YELLOW: 15
+
+tiers:
+  RED: "Act on this within 48h"
+  ORANGE: "Shapes your mental model"
+  YELLOW: "Context, no action needed"
+
+# ---- DOMAINS ----
+# Define what you care about. Keywords calibrate the LLM scorer.
+domains:
+  core_tech:
+    weight: 1.0
+    keywords:
+      - "distributed systems"
+      - "stream processing"
+      - "Kafka"
+      - "Flink"
+      - "data pipeline"
+      - "ML infrastructure"
+      - "feature store"
+
+  ai_tools:
+    weight: 0.8
+    keywords:
+      - "LLM code review"
+      - "AI code generation"
+      - "prompt engineering"
+      - "RAG"
+      - "embeddings"
+
+  career:
+    weight: 0.6
+    keywords:
+      - "staff engineer"
+      - "distributed systems hiring"
+      - "ML engineer NYC"
+
+# ---- SOURCES ----
+sources:
+  arxiv:
+    enabled: true
+    max_results: 50
+    domain: "core_tech"
+    categories:
+      - "cs.DC"
+      - "cs.LG"
+      - "cs.SE"
+
+  hackernews:
+    enabled: true
+    min_points: 50
+    top_n: 100
+    search_terms:
+      - query: "distributed systems"
+        domain: core_tech
+      - query: "LLM code review"
+        domain: ai_tools
+
+  rss:
+    enabled: true
+    feeds:
+      - name: "Simon Willison"
+        url: "https://simonwillison.net/atom/everything/"
+        domain: "ai_tools"
+      - name: "The Gradient"
+        url: "https://thegradient.pub/rss/"
+        domain: "ai_tools"
+      # Add your own feeds here
+
+  serp:
+    enabled: false    # requires SERP_API_KEY
+    sweep: "full"
+    results_per_query: 5
+    queries:
+      - query: "distributed systems research 2026"
+        domain: core_tech
+
+# ---- NOISE FILTERS ----
+noise_filters:
+  skip_domains:
+    - "buzzfeed.com"
+    - "dailymail.co.uk"
+  skip_patterns:
+    - "benchmark leaderboard drama"
+    - "AI will destroy"
+    - "AI will save"
+    - "crypto.*NFT"
+  dedup_window_hours: 48
+
+orient_prompt: |
+  ## Orient (fill in 2 min after reading)
+  - What changed in my model of the world?
+  - Does anything require action in the next 48h?
+  - What did I read that was entertainment, not intelligence?

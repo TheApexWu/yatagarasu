@@ -56,9 +56,14 @@ pip install -r requirements.txt
 
 # configure
 cp .env.example .env
-# add your ANTHROPIC_API_KEY (required) and SERP_API_KEY (optional)
+# add your ANTHROPIC_API_KEY (required) -- get it at https://console.anthropic.com/settings/keys
+# add SERP_API_KEY (optional) -- get it at https://serpapi.com/manage-api-key
 
+cp config.example.yaml config.yaml
 # edit config.yaml -- set your profile, domains, sources
+
+# test
+source .env && python yatagarasu.py --dry-run
 ```
 
 ## Usage

@@ -12,7 +12,6 @@ class FeedItem:
     source: str          # e.g. "arxiv", "hackernews", "rss:Simon Willison", "serp"
     domain: str          # e.g. "ai_research", "fashion_cw", "startup_vc"
     published: str       # YYYY-MM-DD or empty
-    raw_score: float = 0.0
     item_id: str = field(default="", repr=False)
 
     def __post_init__(self):

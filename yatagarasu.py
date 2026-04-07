@@ -30,22 +30,33 @@ from validate import validate_items, assess_quality
 
 def load_config() -> dict:
     config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.yaml")
-    with open(config_path) as f:
-        return yaml.safe_load(f)
+    if not os.path.exists(config_path):
+        print("[yatagarasu] ERROR: config.yaml not found.")
+        print("  Copy config.example.yaml to config.yaml and edit your profile.")
+        sys.exit(1)
+    try:
+        with open(config_path) as f:
+            config = yaml.safe_load(f)
+    except yaml.YAMLError as e:
+        print(f"[yatagarasu] ERROR: config.yaml is malformed YAML: {e}")
+        sys.exit(1)
+    # Validate required sections
+    missing = [k for k in ("profile", "sources", "domains") if k not in config]
+    if missing:
+        print(f"[yatagarasu] ERROR: config.yaml missing required sections: {', '.join(missing)}")
+        print("  See config.example.yaml for the expected structure.")
+        sys.exit(1)
+    return config
 
 
 def dedup_items(items: list[FeedItem]) -> list[FeedItem]:
     """Remove duplicates within a single fetch batch (in-memory)."""
-    seen_urls = set()
-    seen_titles = set()
+    seen_ids = set()
     deduped = []
     for item in items:
-        url_key = item.url.rstrip("/").lower()
-        title_key = item.title.lower().strip()[:60]
-        if url_key in seen_urls or title_key in seen_titles:
+        if item.item_id in seen_ids:
             continue
-        seen_urls.add(url_key)
-        seen_titles.add(title_key)
+        seen_ids.add(item.item_id)
         deduped.append(item)
     return deduped
 
@@ -149,6 +160,12 @@ def run(sweep_type: str = "full", dry_run: bool = False, sources_only: bool = Fa
     all_items, quality_warnings = fetch_all_sources(config, sweep_type)
     items_fetched = len(all_items)
     print(f"[yatagarasu] raw items: {items_fetched}")
+
+    if items_fetched == 0:
+        print("[yatagarasu] WARNING: 0 items fetched from all sources.")
+        print("  This usually means a config problem or network issue.")
+        print("  Try: python yatagarasu.py --sources-only")
+        quality_warnings.append("0 items fetched from all sources -- check config and network.")
 
     # 2. In-memory dedup (within this batch)
     all_items = dedup_items(all_items)
