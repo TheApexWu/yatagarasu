@@ -1,0 +1,215 @@
+# Yatagarasu - Signal Curation System
+# Named for the three-legged crow: divine guide through noise.
+#
+# CUSTOMIZATION GUIDE:
+# - Edit 'profile' to describe yourself and your projects
+# - Add/remove domains with keywords to define what matters to you
+# - Add/remove sources to control where signals come from
+# - Each source type (arxiv, rss, hackernews, serp) has its own config
+# - noise_filters block out known garbage
+# - scoring.tier_budgets cap items per tier to prevent alert fatigue
+
+schedule:
+  morning: "06:30"      # Full sweep: all sources, all domains
+  midday: "12:30"       # Light sweep: reduced scope
+  evening: "18:30"      # Light sweep: catch anything missed
+
+output:
+  digest_dir: "~/Documents/Obsidian Vault/00 - Command Center/Yatagarasu"
+  format: "markdown"
+
+# ---- WHO ARE YOU? ----
+# This drives LLM scoring. Customize for your interests.
+profile:
+  description: "a 23-year-old CS/Data Science grad building across research, product, and culture"
+  projects:
+    - "NeurIPS paper on multi-agent aesthetic negotiation (taste thesis)"
+    - "Eye-tracking attention monitor (Lunatic Eyes) with HMM classifier"
+    - "Chinese style/vice editorial brand (Contraband Wu) covering cigarettes, baijiu, neo-chinoiserie"
+    - "Applying to accelerators (PearX, YC) and AI research jobs (Haven AI, Fusion Health)"
+  noise_patterns:
+    - "Benchmark leaderboard drama (unless top-3 shift)"
+    - "AI doomer/accelerationist culture war"
+    - "Celebrity tech takes"
+    - "Generic 'AI will change everything' articles"
+
+scoring:
+  model: "claude-haiku-4-5-20251001"
+  min_score: 3
+  batch_size: 40
+  tier_budgets:
+    RED: 3          # max RED items per digest (prevents alert fatigue)
+    ORANGE: 8
+    YELLOW: 15
+
+tiers:
+  RED: "Act on this within 48h"
+  ORANGE: "Shapes your mental model"
+  YELLOW: "Context, no action needed"
+
+# ---- DOMAINS ----
+# Define what you care about. Keywords calibrate the LLM scorer.
+# Weight: 1.0 = full priority, lower = deprioritized.
+domains:
+  ai_research:
+    weight: 1.0
+    keywords:
+      - "multi-agent negotiation"
+      - "preference learning"
+      - "aesthetic judgment"
+      - "taste alignment"
+      - "VLM preference"
+      - "emotion vectors"
+      - "sycophancy"
+      - "interpretability"
+      - "RLHF"
+      - "DPO"
+      - "GRPO"
+      - "reward modeling"
+      - "eye tracking"
+      - "attention modeling"
+      - "hidden markov model"
+      - "gaze estimation"
+
+  startup_vc:
+    weight: 0.8
+    keywords:
+      - "YC batch"
+      - "PearX"
+      - "Antler"
+      - "500 Global"
+      - "XRC Labs"
+      - "Emergent Ventures"
+      - "Gold House"
+      - "pre-seed funding"
+      - "consumer AI startup"
+      - "fashion tech funding"
+
+  fashion_cw:
+    weight: 0.9
+    keywords:
+      - "Chinese cigarette culture"
+      - "baijiu"
+      - "neo-chinoiserie"
+      - "Chinese luxury brands"
+      - "vice culture"
+      - "XHS trends"
+      - "Chinese streetwear"
+      - "Xiaohongshu"
+      - "Chinese tobacco industry"
+      - "Asian luxury market"
+
+  career:
+    weight: 0.7
+    keywords:
+      - "Anthropic hiring"
+      - "Mistral hiring"
+      - "OpenAI hiring"
+      - "DeepMind hiring"
+      - "AI research engineer"
+      - "ML engineer NYC"
+
+# ---- SOURCES ----
+# Each source type has its own config section.
+# To add a new source type: write sources/your_type.py, register in sources/__init__.py.
+# To add a new feed within an existing type: just add an entry below.
+sources:
+  arxiv:
+    enabled: true
+    max_results: 50         # halved automatically for light sweeps
+    domain: "ai_research"   # which domain these items belong to
+    # Override keywords/categories per source, or leave blank to use domain defaults
+    categories:
+      - "cs.AI"
+      - "cs.CL"
+      - "cs.CV"
+      - "cs.HC"
+      - "cs.LG"
+
+  hackernews:
+    enabled: true
+    min_points: 50
+    top_n: 100
+    # Search terms: fully config-driven. Add/remove without touching code.
+    search_terms:
+      - query: "AI alignment sycophancy"
+        domain: ai_research
+      - query: "multi-agent LLM"
+        domain: ai_research
+      - query: "eye tracking attention"
+        domain: ai_research
+      - query: "Chinese luxury vice culture"
+        domain: fashion_cw
+      - query: "startup accelerator YC"
+        domain: startup_vc
+      - query: "AI research engineer hiring"
+        domain: career
+
+  rss:
+    enabled: true
+    # Add any RSS/Atom feed. Each gets independent health tracking.
+    feeds:
+      - name: "The Fashion Law"
+        url: "https://www.thefashionlaw.com/feed/"
+        domain: "fashion_cw"
+      - name: "Interconnects (Nathan Lambert)"
+        url: "https://www.interconnects.ai/feed"
+        domain: "ai_research"
+      - name: "Simon Willison"
+        url: "https://simonwillison.net/atom/everything/"
+        domain: "ai_research"
+      - name: "Marginal Revolution"
+        url: "https://marginalrevolution.com/feed"
+        domain: "startup_vc"
+      - name: "Anthropic (community)"
+        url: "https://raw.githubusercontent.com/taobojlen/anthropic-rss-feed/main/anthropic_news_rss.xml"
+        domain: "ai_research"
+      - name: "Lil'Log (Lilian Weng)"
+        url: "https://lilianweng.github.io/index.xml"
+        domain: "ai_research"
+      - name: "The Gradient"
+        url: "https://thegradient.pub/rss/"
+        domain: "ai_research"
+      - name: "Luxury Daily"
+        url: "https://www.luxurydaily.com/feed/"
+        domain: "fashion_cw"
+
+  serp:
+    enabled: true
+    sweep: "full"           # only run on full sweeps
+    results_per_query: 5
+    # Search queries: fully config-driven.
+    queries:
+      - query: "multi-agent LLM negotiation preference 2026"
+        domain: ai_research
+      - query: "eye tracking attention HMM webcam research 2026"
+        domain: ai_research
+      - query: "Chinese cigarette culture baijiu vice editorial 2026"
+        domain: fashion_cw
+      - query: "neo-chinoiserie Chinese luxury streetwear trends 2026"
+        domain: fashion_cw
+      - query: "YC PearX accelerator batch 2026 deadline"
+        domain: startup_vc
+      - query: "Anthropic Mistral OpenAI hiring research engineer 2026"
+        domain: career
+
+# ---- NOISE FILTERS ----
+noise_filters:
+  skip_domains:
+    - "buzzfeed.com"
+    - "dailymail.co.uk"
+    - "techbro-hype.com"
+  skip_patterns:
+    - "benchmark leaderboard drama"
+    - "AI will destroy"
+    - "AI will save"
+    - "crypto.*NFT"
+    - "celebrity.*AI"
+  dedup_window_hours: 48    # items seen within this window are suppressed
+
+# ---- ORIENT PROMPT ----
+orient_prompt: |
+  ## Orient (fill in 2 min after reading)
+  - What changed in my model of the world?
+  - Does anything require action in the next 48h?
+  - What did I read that was entertainment, not intelligence?
