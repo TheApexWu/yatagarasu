@@ -62,9 +62,9 @@ cat > "$PLIST_DIR/com.yatagarasu.morning.plist" << EOF
     <key>StartCalendarInterval</key>
     <dict>
         <key>Hour</key>
-        <integer>6</integer>
+        <integer>7</integer>
         <key>Minute</key>
-        <integer>30</integer>
+        <integer>0</integer>
     </dict>
     <key>StandardOutPath</key>
     <string>$SCRIPT_DIR/yatagarasu.log</string>
@@ -91,9 +91,9 @@ cat > "$PLIST_DIR/com.yatagarasu.midday.plist" << EOF
     <key>StartCalendarInterval</key>
     <dict>
         <key>Hour</key>
-        <integer>12</integer>
+        <integer>13</integer>
         <key>Minute</key>
-        <integer>30</integer>
+        <integer>0</integer>
     </dict>
     <key>StandardOutPath</key>
     <string>$SCRIPT_DIR/yatagarasu.log</string>
@@ -120,9 +120,9 @@ cat > "$PLIST_DIR/com.yatagarasu.evening.plist" << EOF
     <key>StartCalendarInterval</key>
     <dict>
         <key>Hour</key>
-        <integer>18</integer>
+        <integer>19</integer>
         <key>Minute</key>
-        <integer>30</integer>
+        <integer>0</integer>
     </dict>
     <key>StandardOutPath</key>
     <string>$SCRIPT_DIR/yatagarasu.log</string>
@@ -140,7 +140,7 @@ launchctl load "$PLIST_DIR/com.yatagarasu.evening.plist" 2>/dev/null || true
 
 echo ""
 echo "=== Yatagarasu installed ==="
-echo "Schedule: 6:30am (full), 12:30pm (light), 6:30pm (light)"
+echo "Schedule: 7:00am (full), 1:00pm (light), 7:00pm (light)"
 echo "Digests:  $DIGEST_DIR"
 echo "Logs:     $SCRIPT_DIR/yatagarasu.log"
 echo ""

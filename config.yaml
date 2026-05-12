@@ -1,44 +1,37 @@
 # Yatagarasu - Signal Curation System
-# Named for the three-legged crow: divine guide through noise.
-#
-# CUSTOMIZATION GUIDE:
-# - Edit 'profile' to describe yourself and your projects
-# - Add/remove domains with keywords to define what matters to you
-# - Add/remove sources to control where signals come from
-# - Each source type (arxiv, rss, hackernews, serp) has its own config
-# - noise_filters block out known garbage
-# - scoring.tier_budgets cap items per tier to prevent alert fatigue
+# Updated May 12, 2026 for Majikari + Antler focus
 
 schedule:
-  morning: "06:30"      # Full sweep: all sources, all domains
-  midday: "12:30"       # Light sweep: reduced scope
-  evening: "18:30"      # Light sweep: catch anything missed
+  morning: "07:00"      # Full sweep: all sources, all domains
+  midday: "13:00"       # Light sweep: reduced scope
+  evening: "19:00"      # Light sweep: catch anything missed
 
 output:
-  digest_dir: "~/Documents/Obsidian Vault/00 - Command Center/Yatagarasu"  # personal path, yours will differ
+  digest_dir: "~/Documents/Obsidian Vault/00 - Command Center/Yatagarasu"
   format: "markdown"
 
 # ---- WHO ARE YOU? ----
-# This drives LLM scoring. Customize for your interests.
 profile:
-  description: "a 23-year-old CS/Data Science grad building across research, product, and culture"
+  description: "a 23-year-old founder-engineer building cross-border data intelligence systems. Thinks like a quant (signal extraction, source weighting, noise filtering), builds like a Palantir FDSE (heterogeneous data fusion, entity-centric ontology), and operates like a cultural intelligence analyst (cascade detection, coded language, temporal lag as product)."
   projects:
-    - "NeurIPS paper on multi-agent aesthetic negotiation (taste thesis)"
-    - "Eye-tracking attention monitor (Lunatic Eyes) with HMM classifier"
-    - "Chinese style/vice editorial brand (Contraband Wu) covering cigarettes, baijiu, neo-chinoiserie"
-    - "Applying to accelerators (PearX, YC) and AI research jobs (Haven AI, Fusion Health)"
+    - "Majikari: cross-border search engine aggregating 186K Japanese secondhand fashion listings (Mercari JP, Yahoo Auctions) with CLIP classification, price intelligence, and proxy cost transparency"
+    - "Antler NYC11 residency: Pre-IC pitch May 27-28, seeking $350K SAFE, need validation + co-founder"
+    - "Contraband Wu: Chinese consumer culture intelligence -- cross-platform cascade tracking (XHS, Bilibili, Weibo), coded language detection, aesthetic migration prediction. Data moat accumulating."
+    - "Crucible: NeurIPS 2026 paper on emergent deception in LLM game theory (submitted, maintenance mode)"
   noise_patterns:
     - "Benchmark leaderboard drama (unless top-3 shift)"
     - "AI doomer/accelerationist culture war"
     - "Celebrity tech takes"
     - "Generic 'AI will change everything' articles"
+    - "Crypto/NFT/Web3 unless related to cross-border payments"
+    - "Listicles and shallow trend roundups without data"
 
 scoring:
   model: "claude-haiku-4-5-20251001"
   min_score: 3
   batch_size: 40
   tier_budgets:
-    RED: 3          # max RED items per digest (prevents alert fatigue)
+    RED: 3
     ORANGE: 8
     YELLOW: 15
 
@@ -48,150 +41,403 @@ tiers:
   YELLOW: "Context, no action needed"
 
 # ---- DOMAINS ----
-# Define what you care about. Keywords calibrate the LLM scorer.
-# Weight: 1.0 = full priority, lower = deprioritized.
 domains:
-  ai_research:
+  jp_fashion_market:
     weight: 1.0
     keywords:
-      - "multi-agent negotiation"
-      - "preference learning"
-      - "aesthetic judgment"
-      - "taste alignment"
-      - "VLM preference"
-      - "emotion vectors"
-      - "sycophancy"
-      - "interpretability"
-      - "RLHF"
-      - "DPO"
-      - "GRPO"
-      - "reward modeling"
-      - "eye tracking"
-      - "attention modeling"
-      - "hidden markov model"
-      - "gaze estimation"
+      - "Japanese secondhand fashion"
+      - "Mercari Japan"
+      - "Yahoo Auctions Japan"
+      - "Buyee"
+      - "ZenMarket"
+      - "FromJapan"
+      - "proxy service Japan"
+      - "visvim"
+      - "Kapital"
+      - "Undercover"
+      - "Needles"
+      - "Issey Miyake"
+      - "Comme des Garcons"
+      - "archive fashion"
+      - "Japanese streetwear"
+      - "secondhand luxury"
+      - "resale market Japan"
+      - "cross-border e-commerce"
 
-  startup_vc:
+  founder_vc:
+    weight: 1.0
+    keywords:
+      - "Antler"
+      - "pre-seed funding"
+      - "seed round"
+      - "Pre-IC pitch"
+      - "founder market fit"
+      - "consumer marketplace startup"
+      - "fashion tech funding"
+      - "cross-border commerce startup"
+      - "marketplace liquidity"
+      - "e-commerce aggregator"
+      - "a16z"
+      - "YC batch"
+      - "co-founder search"
+      - "startup validation"
+
+  ai_applied:
     weight: 0.8
     keywords:
-      - "YC batch"
-      - "PearX"
-      - "Antler"
-      - "500 Global"
-      - "XRC Labs"
-      - "Emergent Ventures"
-      - "Gold House"
-      - "pre-seed funding"
-      - "consumer AI startup"
-      - "fashion tech funding"
+      - "CLIP classification"
+      - "vision-language model"
+      - "embedding search"
+      - "retrieval augmented"
+      - "multi-agent systems"
+      - "LLM agent"
+      - "preference learning"
+      - "recommendation system"
+      - "search relevance"
+      - "web scraping"
+      - "data pipeline"
+      - "Claude API"
+      - "Anthropic"
 
-  fashion_cw:
+  trade_tariff:
     weight: 0.9
     keywords:
-      - "Chinese cigarette culture"
-      - "baijiu"
-      - "neo-chinoiserie"
-      - "Chinese luxury brands"
-      - "vice culture"
-      - "XHS trends"
-      - "Chinese streetwear"
-      - "Xiaohongshu"
-      - "Chinese tobacco industry"
-      - "Asian luxury market"
+      - "de minimis"
+      - "import tariff"
+      - "US tariff Japan"
+      - "cross-border shipping"
+      - "customs duty"
+      - "Section 321"
+      - "trade policy"
+      - "import tax"
+      - "proxy shipping"
+      - "international e-commerce tariff"
 
-  career:
+  chinese_consumer:
+    weight: 0.9
+    keywords:
+      - "Xiaohongshu"
+      - "XHS trends"
+      - "Little Red Book"
+      - "Chinese luxury"
+      - "neo-chinoiserie"
+      - "Chinese streetwear"
+      - "baijiu"
+      - "Chinese cigarette culture"
+      - "Chinese consumer behavior"
+      - "guochao"
+      - "国潮"
+      - "新中式"
+      - "Chinese Gen Z"
+      - "Douyin trends"
+      - "Bilibili culture"
+      - "Chinese censorship"
+      - "coded language China"
+      - "Chinese social media"
+      - "WeChat ecosystem"
+      - "Asian luxury market"
+      - "Chinese fragrance"
+      - "agarwood incense"
+      - "Shein Temu"
+      - "cross-border China"
+      - "sinophile"
+
+  systems_infra:
     weight: 0.7
     keywords:
-      - "Anthropic hiring"
-      - "Mistral hiring"
-      - "OpenAI hiring"
-      - "DeepMind hiring"
-      - "AI research engineer"
-      - "ML engineer NYC"
+      - "distributed systems"
+      - "data pipeline architecture"
+      - "web scraping at scale"
+      - "entity resolution"
+      - "knowledge graph"
+      - "data fusion"
+      - "ontology design"
+      - "Palantir"
+      - "Foundry"
+      - "forward deployed"
+      - "real-time data processing"
+      - "event-driven architecture"
+      - "stream processing"
+      - "data mesh"
+      - "SQLite at scale"
+      - "embedding index"
+      - "vector search"
+
+  quant_thinking:
+    weight: 0.6
+    keywords:
+      - "signal to noise"
+      - "alternative data"
+      - "quantitative research"
+      - "market making"
+      - "statistical arbitrage"
+      - "information asymmetry"
+      - "expected value"
+      - "Bayesian"
+      - "anomaly detection"
+      - "time series"
+      - "portfolio construction"
+      - "risk management"
+      - "Two Sigma"
+      - "Jane Street"
+      - "Citadel"
+      - "Renaissance Technologies"
+      - "systematic trading"
 
 # ---- SOURCES ----
-# Each source type has its own config section.
-# To add a new source type: write sources/your_type.py, register in sources/__init__.py.
-# To add a new feed within an existing type: just add an entry below.
 sources:
   arxiv:
     enabled: true
-    max_results: 50         # halved automatically for light sweeps
-    domain: "ai_research"   # which domain these items belong to
-    # Override keywords/categories per source, or leave blank to use domain defaults
+    max_results: 40
+    domain: "ai_applied"
     categories:
       - "cs.AI"
       - "cs.CL"
       - "cs.CV"
-      - "cs.HC"
+      - "cs.IR"
       - "cs.LG"
+      - "cs.DC"
+      - "cs.SI"
+      - "q-fin.TR"
 
   hackernews:
     enabled: true
-    min_points: 50
-    top_n: 100
-    # Search terms: fully config-driven. Add/remove without touching code.
+    min_points: 80
+    top_n: 80
     search_terms:
-      - query: "AI alignment sycophancy"
-        domain: ai_research
-      - query: "multi-agent LLM"
-        domain: ai_research
-      - query: "eye tracking attention"
-        domain: ai_research
-      - query: "Chinese luxury vice culture"
-        domain: fashion_cw
-      - query: "startup accelerator YC"
-        domain: startup_vc
-      - query: "AI research engineer hiring"
-        domain: career
+      - query: "Japanese fashion secondhand"
+        domain: jp_fashion_market
+      - query: "cross-border e-commerce marketplace"
+        domain: jp_fashion_market
+      - query: "proxy shipping Japan"
+        domain: jp_fashion_market
+      - query: "CLIP image classification product"
+        domain: ai_applied
+      - query: "LLM agent tool use"
+        domain: ai_applied
+      - query: "startup marketplace validation"
+        domain: founder_vc
+      - query: "pre-seed accelerator funding"
+        domain: founder_vc
+      - query: "import tariff de minimis"
+        domain: trade_tariff
+      - query: "Xiaohongshu Little Red Book trends"
+        domain: chinese_consumer
+      - query: "Chinese consumer Gen Z guochao"
+        domain: chinese_consumer
+      - query: "Chinese censorship coded language social media"
+        domain: chinese_consumer
+      - query: "Palantir forward deployed engineer"
+        domain: systems_infra
+      - query: "alternative data quantitative research"
+        domain: quant_thinking
+      - query: "entity resolution data fusion pipeline"
+        domain: systems_infra
 
   rss:
     enabled: true
-    # Add any RSS/Atom feed. Each gets independent health tracking.
     feeds:
-      - name: "The Fashion Law"
-        url: "https://www.thefashionlaw.com/feed/"
-        domain: "fashion_cw"
-      - name: "Interconnects (Nathan Lambert)"
-        url: "https://www.interconnects.ai/feed"
-        domain: "ai_research"
-      - name: "Simon Willison"
-        url: "https://simonwillison.net/atom/everything/"
-        domain: "ai_research"
+      # -- VC / Founder --
+      - name: "a16z Future"
+        url: "https://future.com/feed"
+        domain: "founder_vc"
+      - name: "YC Blog"
+        url: "https://www.ycombinator.com/blog/feed/"
+        domain: "founder_vc"
+      - name: "Lenny's Newsletter"
+        url: "https://www.lennysnewsletter.com/feed"
+        domain: "founder_vc"
       - name: "Marginal Revolution"
         url: "https://marginalrevolution.com/feed"
-        domain: "startup_vc"
-      - name: "Anthropic (community)"
-        url: "https://raw.githubusercontent.com/taobojlen/anthropic-rss-feed/main/anthropic_news_rss.xml"
-        domain: "ai_research"
+        domain: "founder_vc"
+      - name: "Jeff Becker (Monday Morning Meeting)"
+        url: "https://jeffbecker.substack.com/feed"
+        domain: "founder_vc"
+      - name: "Sam Blumenthal (Compounding Thoughts)"
+        url: "https://samblumenthal.substack.com/feed"
+        domain: "founder_vc"
+      - name: "The Generalist"
+        url: "https://www.generalist.com/feed"
+        domain: "founder_vc"
+      - name: "Not Boring (Packy McCormick)"
+        url: "https://www.notboring.co/feed"
+        domain: "founder_vc"
+
+      # -- AI / Tech --
+      - name: "Simon Willison"
+        url: "https://simonwillison.net/atom/everything/"
+        domain: "ai_applied"
+      - name: "Interconnects (Nathan Lambert)"
+        url: "https://www.interconnects.ai/feed"
+        domain: "ai_applied"
       - name: "Lil'Log (Lilian Weng)"
         url: "https://lilianweng.github.io/index.xml"
-        domain: "ai_research"
-      - name: "The Gradient"
-        url: "https://thegradient.pub/rss/"
-        domain: "ai_research"
+        domain: "ai_applied"
+      - name: "Anthropic Blog"
+        url: "https://raw.githubusercontent.com/taobojlen/anthropic-rss-feed/main/anthropic_news_rss.xml"
+        domain: "ai_applied"
+
+      # -- Fashion / Market --
+      - name: "The Fashion Law"
+        url: "https://www.thefashionlaw.com/feed/"
+        domain: "jp_fashion_market"
+      - name: "Highsnobiety"
+        url: "https://www.highsnobiety.com/feed/"
+        domain: "jp_fashion_market"
+      - name: "Hypebeast"
+        url: "https://hypebeast.com/feed"
+        domain: "jp_fashion_market"
+
+      # -- China / Luxury / Culture --
       - name: "Luxury Daily"
         url: "https://www.luxurydaily.com/feed/"
-        domain: "fashion_cw"
+        domain: "chinese_consumer"
+      - name: "Sinocism (Bill Bishop)"
+        url: "https://sinocism.com/feed"
+        domain: "chinese_consumer"
+      - name: "SupChina / The China Project"
+        url: "https://thechinaproject.com/feed/"
+        domain: "chinese_consumer"
+      - name: "What's on Weibo"
+        url: "https://www.whatsonweibo.com/feed/"
+        domain: "chinese_consumer"
+      - name: "Dao Insights"
+        url: "https://daoinsights.com/feed/"
+        domain: "chinese_consumer"
+      - name: "Radii China"
+        url: "https://radii.co/feed"
+        domain: "chinese_consumer"
+
+      # -- Systems / Infra / Quant --
+      - name: "Martin Kleppmann"
+        url: "https://martin.kleppmann.com/atom.xml"
+        domain: "systems_infra"
+      - name: "The Pragmatic Engineer"
+        url: "https://blog.pragmaticengineer.com/rss/"
+        domain: "systems_infra"
+      - name: "Matt Levine (Money Stuff)"
+        url: "https://www.bloomberg.com/opinion/authors/ARbTQlRLRjE/matthew-s-levine.rss"
+        domain: "quant_thinking"
+
+  reddit:
+    enabled: true
+    subreddits:
+      - name: "japanesestreetwear"
+        domain: "jp_fashion_market"
+        min_score: 5
+        limit: 25
+      - name: "rawdenim"
+        domain: "jp_fashion_market"
+        min_score: 10
+        limit: 15
+      - name: "malefashionadvice"
+        domain: "jp_fashion_market"
+        min_score: 20
+        limit: 15
+        search_terms: ["japanese", "japan", "visvim", "kapital", "needles", "undercover", "issey"]
+      - name: "startups"
+        domain: "founder_vc"
+        min_score: 15
+        limit: 15
+      - name: "Entrepreneur"
+        domain: "founder_vc"
+        min_score: 20
+        limit: 10
+        search_terms: ["marketplace", "validation", "pre-seed", "accelerator"]
+      - name: "China"
+        domain: "chinese_consumer"
+        min_score: 10
+        limit: 15
+        search_terms: ["xiaohongshu", "douyin", "consumer", "luxury", "fashion", "trend", "censorship", "social media"]
+      - name: "ChineseLanguage"
+        domain: "chinese_consumer"
+        min_score: 5
+        limit: 10
+        search_terms: ["slang", "internet", "censorship", "coded", "新"]
+      - name: "ExperiencedDevs"
+        domain: "systems_infra"
+        min_score: 15
+        limit: 15
+        search_terms: ["pipeline", "distributed", "scraping", "architecture", "data fusion", "entity"]
+      - name: "quant"
+        domain: "quant_thinking"
+        min_score: 10
+        limit: 10
 
   serp:
     enabled: true
-    sweep: "full"           # only run on full sweeps
-    results_per_query: 5
-    # Search queries: fully config-driven.
+    sweep: "full"
+    results_per_query: 3
     queries:
-      - query: "multi-agent LLM negotiation preference 2026"
-        domain: ai_research
-      - query: "eye tracking attention HMM webcam research 2026"
-        domain: ai_research
-      - query: "Chinese cigarette culture baijiu vice editorial 2026"
-        domain: fashion_cw
-      - query: "neo-chinoiserie Chinese luxury streetwear trends 2026"
-        domain: fashion_cw
-      - query: "YC PearX accelerator batch 2026 deadline"
-        domain: startup_vc
-      - query: "Anthropic Mistral OpenAI hiring research engineer 2026"
-        domain: career
+      # 3 queries x 3 results x 1 sweep/day = 9 calls/day = ~270/mo
+      # Free tier = 100/mo. Budget: run serp ~3x/week, not daily.
+      # To stay under limit: disable serp on light-sweep days or reduce to 2 queries.
+      - query: "Mercari Global cross-border Japan fashion 2026"
+        domain: jp_fashion_market
+      - query: "de minimis tariff cross-border shipping Japan 2026"
+        domain: trade_tariff
+      - query: "Xiaohongshu Chinese consumer trends guochao 2026"
+        domain: chinese_consumer
+
+  competitors:
+    enabled: true
+    sweep: "full"
+    targets:
+      - name: "GrailHunt"
+        urls:
+          - "https://grailhunt.app"
+        domain: "jp_fashion_market"
+      - name: "Mercari Global"
+        urls:
+          - "https://about.mercari.com/en/press/news/"
+          - "https://jp.mercari.com/search?keyword=global"
+        domain: "jp_fashion_market"
+      - name: "Buyee"
+        urls:
+          - "https://buyee.jp/help/info"
+        domain: "jp_fashion_market"
+      - name: "WGSN"
+        urls:
+          - "https://www.wgsn.com/en/blogs"
+        domain: "chinese_consumer"
+      - name: "Heuritech"
+        urls:
+          - "https://www.heuritech.com/blog/"
+        domain: "chinese_consumer"
+      - name: "Qiangua (千瓜)"
+        urls:
+          - "https://www.qian-gua.com/blog"
+        domain: "chinese_consumer"
+
+  bluesky:
+    enabled: true
+    accounts:
+      # -- VC / Founder signal --
+      - handle: "garrytan.bsky.social"
+        label: "Garry Tan (YC)"
+        domain: "founder_vc"
+        limit: 15
+      - handle: "paulg.bsky.social"
+        label: "Paul Graham"
+        domain: "founder_vc"
+        limit: 15
+      - handle: "sama.bsky.social"
+        label: "Sam Altman"
+        domain: "founder_vc"
+        limit: 10
+      - handle: "karpathy.bsky.social"
+        label: "Andrej Karpathy"
+        domain: "ai_applied"
+        limit: 15
+      - handle: "simonw.bsky.social"
+        label: "Simon Willison"
+        domain: "ai_applied"
+        limit: 15
+      # -- Fashion / Culture --
+      - handle: "dietprada.bsky.social"
+        label: "Diet Prada"
+        domain: "jp_fashion_market"
+        limit: 10
 
 # ---- NOISE FILTERS ----
 noise_filters:
@@ -205,7 +451,19 @@ noise_filters:
     - "AI will save"
     - "crypto.*NFT"
     - "celebrity.*AI"
-  dedup_window_hours: 48    # items seen within this window are suppressed
+    - "Web3.*metaverse"
+  dedup_window_hours: 48
+
+# ---- NOTIFICATIONS ----
+notifications:
+  enabled: true
+  max_per_sweep: 8
+  backends:
+    - type: "ntfy"
+      topic: "yatagarasu-alexwu"
+      min_tier: "RED"
+    - type: "macos"
+      min_tier: "ORANGE"
 
 # ---- ORIENT PROMPT ----
 orient_prompt: |
@@ -213,3 +471,6 @@ orient_prompt: |
   - What changed in my model of the world?
   - Does anything require action in the next 48h?
   - What did I read that was entertainment, not intelligence?
+  - Any signal relevant to Pre-IC pitch (May 27)?
+  - Any cascade signal? (same entity across Chinese + Western sources = breakout)
+  - What would a quant do with this data? What would Palantir build?

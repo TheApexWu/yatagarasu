@@ -1,14 +1,16 @@
-"""Yatagarasu - Digest renderer with health alerts and source quality."""
+"""Yatagarasu - Digest renderer with health alerts, trending, and source quality."""
 
 import os
 from datetime import datetime
 from pathlib import Path
 from models import FeedItem
+from trending import TrendingSignal
 import state
 
 
 def render(scored_items: list[tuple[FeedItem, int, str, str]], config: dict, sweep_type: str,
-           quality_warnings: list[str] = None) -> str:
+           quality_warnings: list[str] = None,
+           trending_signals: list[TrendingSignal] = None) -> str:
     """Render scored items into a markdown digest."""
     now = datetime.now()
     date_str = now.strftime("%Y-%m-%d")
@@ -34,6 +36,17 @@ def render(scored_items: list[tuple[FeedItem, int, str, str]], config: dict, swe
         for w in quality_warnings:
             lines.append(f"- {w}")
         lines.append("")
+
+    # Trending signals (breakout entities across 3+ sources)
+    if trending_signals:
+        lines.append("## TRENDING (cross-source breakout)")
+        lines.append("")
+        for sig in trending_signals:
+            src_tags = " ".join(f"`{s}`" for s in sig.sources)
+            lines.append(f"- **{sig.entity}** -- {sig.source_count} sources: {src_tags}")
+            for title in sig.titles[:5]:
+                lines.append(f"  - {title}")
+            lines.append("")
 
     # Group by tier
     tiers = {"RED": [], "ORANGE": [], "YELLOW": []}

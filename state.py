@@ -63,6 +63,16 @@ def init_db():
             scored_4plus INTEGER DEFAULT 0
         );
 
+        CREATE TABLE IF NOT EXISTS trending_alerts (
+            entity TEXT NOT NULL,
+            source_count INTEGER NOT NULL,
+            sources TEXT NOT NULL,
+            first_seen TEXT NOT NULL,
+            detected_at TEXT NOT NULL,
+            PRIMARY KEY (entity, detected_at)
+        );
+        CREATE INDEX IF NOT EXISTS idx_trending_detected ON trending_alerts(detected_at);
+
         CREATE TABLE IF NOT EXISTS digests (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             timestamp TEXT NOT NULL,

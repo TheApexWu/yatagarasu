@@ -78,6 +78,7 @@ def score_items(items: list[FeedItem], config: dict) -> list[tuple[FeedItem, int
         payload = json.dumps({
             "model": model,
             "max_tokens": 2048,
+            "temperature": 0,
             "system": system_prompt,
             "messages": [{"role": "user", "content": f"Score these items:\n\n{items_text}"}],
         }).encode()
@@ -98,18 +99,32 @@ def score_items(items: list[FeedItem], config: dict) -> list[tuple[FeedItem, int
                     if block.get("type") == "text":
                         text += block["text"]
 
-                start = text.find('[{"')
+                # Strip markdown code fences if present
+                clean = text.strip()
+                if clean.startswith("```"):
+                    clean = clean.split("\n", 1)[-1]  # drop first line
+                    if clean.endswith("```"):
+                        clean = clean[:-3]
+                    clean = clean.strip()
+
+                start = clean.find('[{"')
                 if start < 0:
-                    start = text.find("[")
-                end = text.rfind("]") + 1
+                    start = clean.find("[")
+                end = clean.rfind("]") + 1
                 if start >= 0 and end > start:
-                    scores_data = json.loads(text[start:end])
+                    scores_data = json.loads(clean[start:end])
                     score_map = {s["idx"]: s for s in scores_data}
 
+                    # Normalize tier names (Haiku sometimes returns "NOISE" instead of tier)
+                    _TIER_MAP = {"RED": "RED", "ORANGE": "ORANGE", "YELLOW": "YELLOW",
+                                 "NOISE": "YELLOW", "LOW": "YELLOW",
+                                 "NOISE+KERNEL": "YELLOW", "NOISEKERNEL": "YELLOW"}
                     for j, item in enumerate(batch):
                         if j in score_map:
                             s = score_map[j]
-                            scored.append((item, s["score"], s.get("tier", "YELLOW"), s.get("why", "")))
+                            raw_tier = s.get("tier", "YELLOW").upper()
+                            tier = _TIER_MAP.get(raw_tier, "YELLOW")
+                            scored.append((item, s["score"], tier, s.get("why", "")))
                         else:
                             scored.append((item, 2, "YELLOW", "unscored"))
                     batch_scored = True

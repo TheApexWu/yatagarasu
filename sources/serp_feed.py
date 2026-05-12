@@ -16,8 +16,16 @@ def fetch(source_config: dict, global_config: dict, sweep_type: str = "full") ->
         sweep: str ("full" = only run on full sweeps)
         queries: list[{query: str, domain: str}]
         results_per_query: int (default 5)
+        run_days: list[int] (0=Mon, 6=Sun; default [0,2,4] = MWF)
     """
     if sweep_type == "light" and source_config.get("sweep", "full") == "full":
+        return []
+
+    # Only run on configured days to conserve API quota
+    from datetime import datetime
+    run_days = source_config.get("run_days", [0, 2, 4])  # MWF default
+    if datetime.now().weekday() not in run_days:
+        print("[serp] skipping (not a run day)")
         return []
 
     api_key = os.environ.get("SERP_API_KEY", "")

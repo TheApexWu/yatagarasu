@@ -25,6 +25,8 @@ from models import FeedItem
 from sources import SOURCE_TYPES
 from scorer import score_items
 from digest import render, write_digest
+from notify import notify
+from trending import detect_trending, record_trending
 from validate import validate_items, assess_quality
 
 
@@ -99,8 +101,7 @@ def fetch_all_sources(config: dict, sweep_type: str) -> tuple[list[FeedItem], li
 
         # skip full-only sources on light sweeps
         if sweep_type == "light" and source_cfg.get("sweep") == "full":
-            if source_type == "serp":
-                continue
+            continue
 
         print(f"[yatagarasu] fetching {source_type}...")
         try:
@@ -196,8 +197,18 @@ def run(sweep_type: str = "full", dry_run: bool = False, sources_only: bool = Fa
     state.update_scores(scored)
     state.update_source_quality(scored)
 
+    # 5b. Trending detection
+    print("[yatagarasu] detecting trending signals...")
+    trending_signals = detect_trending(scored, config)
+    if trending_signals:
+        print(f"[yatagarasu] {len(trending_signals)} trending signal(s) detected")
+        record_trending(trending_signals)
+    else:
+        print("[yatagarasu] no trending signals")
+
     # 6. Render digest
-    content = render(scored, config, sweep_type, quality_warnings=quality_warnings)
+    content = render(scored, config, sweep_type, quality_warnings=quality_warnings,
+                     trending_signals=trending_signals)
 
     # Count tiers for metadata
     min_score = config.get("scoring", {}).get("min_score", 3)
@@ -218,6 +229,10 @@ def run(sweep_type: str = "full", dry_run: bool = False, sources_only: bool = Fa
     filepath = write_digest(content, config)
     state.record_digest(sweep_type, items_fetched, items_after_dedup,
                        len(scored), items_surfaced, red, orange, yellow, filepath)
+
+    # 8. Push notifications for high-tier items
+    notify(scored, config)
+
     print(f"[yatagarasu] done. {filepath}")
 
 
