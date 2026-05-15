@@ -7,7 +7,7 @@ Adding a new source type:
   3. Add config entries under sources[] in config.yaml
 """
 
-from sources import arxiv_feed, hn_feed, rss_feed, serp_feed, reddit_feed, competitor_feed, bluesky_feed
+from sources import arxiv_feed, hn_feed, rss_feed, serp_feed, reddit_feed, competitor_feed, bluesky_feed, cw_bridge
 
 # Maps source type names to their fetch modules.
 # Each module must implement: fetch(source_config: dict, global_config: dict, sweep_type: str) -> list[FeedItem]
@@ -19,4 +19,5 @@ SOURCE_TYPES = {
     "reddit": reddit_feed,
     "competitors": competitor_feed,
     "bluesky": bluesky_feed,
+    "cw_bridge": cw_bridge,
 }

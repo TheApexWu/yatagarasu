@@ -409,6 +409,10 @@ sources:
           - "https://www.qian-gua.com/blog"
         domain: "chinese_consumer"
 
+  cw_bridge:
+    enabled: true
+    sweep: "full"
+
   bluesky:
     enabled: true
     accounts:

@@ -3,6 +3,7 @@
 Detects breakout signals: entities appearing in 3+ distinct sources within 24h.
 Uses simple regex-based entity extraction -- no external NLP libraries.
 """
+from __future__ import annotations
 
 import re
 import sqlite3

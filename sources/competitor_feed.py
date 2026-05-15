@@ -3,6 +3,7 @@
 Fetches competitor URLs, extracts title + meta description + relevant text.
 Dedup handled by the global state layer (content hash changes trigger new items).
 """
+from __future__ import annotations
 
 import re
 import hashlib

@@ -3,6 +3,7 @@
 Validates items post-fetch, tracks extraction quality per source.
 Surfaces degradation so extraction doesn't fail silently.
 """
+from __future__ import annotations
 
 from models import FeedItem
 
