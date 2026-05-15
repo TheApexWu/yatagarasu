@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YATAGARASU — Signal Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #08080c;
+    --bg-card: #0f0f14;
+    --bg-card-hover: #14141c;
+    --border: #1a1a24;
+    --border-subtle: #141420;
+    --text: #9898a8;
+    --text-dim: #505060;
+    --text-bright: #e4e4f0;
+    --text-white: #f4f4fa;
+    --red: #ff4057;
+    --red-glow: rgba(255,64,87,0.15);
+    --red-soft: rgba(255,64,87,0.06);
+    --orange: #ff9030;
+    --orange-glow: rgba(255,144,48,0.12);
+    --orange-soft: rgba(255,144,48,0.05);
+    --green: #00e0a0;
+    --cyan: #40d4d0;
+    --purple: #a480ff;
+    --mono: 'JetBrains Mono', 'SF Mono', monospace;
+    --sans: 'Inter', -apple-system, sans-serif;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:var(--sans); font-size:13px; line-height:1.55; -webkit-font-smoothing:antialiased; }
+
+  /* HEADER */
+  header { padding:24px 40px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border); }
+  .brand { display:flex; align-items:center; gap:14px; }
+  .brand-icon { width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--red),#c02040);display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 0 20px var(--red-glow); }
+  .brand h1 { font-family:var(--mono); font-size:15px; font-weight:600; color:var(--text-white); letter-spacing:3px; }
+  .brand p { font-size:10px; color:var(--text-dim); letter-spacing:1px; }
+  .hdr-right { display:flex;align-items:center;gap:16px;font-family:var(--mono);font-size:11px;color:var(--text-dim); }
+  .live { width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px rgba(0,224,160,0.5);animation:pulse 2.5s ease-in-out infinite; }
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+  /* METRICS */
+  .metrics { display:grid; grid-template-columns:repeat(6,1fr); border-bottom:1px solid var(--border); }
+  .m { padding:18px 24px; text-align:center; border-right:1px solid var(--border); }
+  .m:last-child { border-right:none; }
+  .m-val { font-family:var(--mono); font-size:26px; font-weight:600; color:var(--text-white); }
+  .m-val.red { color:var(--red); text-shadow:0 0 16px var(--red-glow); }
+  .m-val.orange { color:var(--orange); }
+  .m-val.green { color:var(--green); }
+  .m-lab { font-size:9px; text-transform:uppercase; letter-spacing:2px; color:var(--text-dim); margin-top:4px; }
+
+  /* MAIN */
+  .main { display:grid; grid-template-columns:1fr 400px; min-height:calc(100vh - 140px); }
+
+  /* FEED */
+  .feed { border-right:1px solid var(--border); overflow-y:auto; max-height:calc(100vh - 140px); }
+  .feed-hdr { position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--border);padding:14px 28px; display:flex;justify-content:space-between;align-items:center; }
+  .feed-hdr h2 { font-size:13px; font-weight:600; color:var(--text-bright); }
+  .feed-hdr span { font-family:var(--mono); font-size:11px; color:var(--text-dim); }
+  .filters { display:flex;gap:4px;padding:10px 28px;position:sticky;top:42px;z-index:19;background:var(--bg);border-bottom:1px solid var(--border);overflow-x:auto; }
+  .filters::-webkit-scrollbar{display:none}
+  .fb { font-family:var(--mono);font-size:10px;padding:4px 12px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text-dim);cursor:pointer;white-space:nowrap;transition:all .15s; }
+  .fb:hover{border-color:var(--text-dim);color:var(--text);background:var(--bg-card)}
+  .fb.on{border-color:var(--cyan);color:var(--cyan);background:rgba(64,212,208,.06)}
+
+  /* TIER BADGE */
+  .tbadge { font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:2.5px;padding:14px 28px 8px;display:flex;align-items:center;gap:10px;text-transform:uppercase;position:sticky;top:80px;z-index:15;background:var(--bg); }
+  .tbadge.red{color:var(--red)} .tbadge.orange{color:var(--orange)}
+  .tbadge::after{content:'';flex:1;height:1px;background:currentColor;opacity:.15}
+
+  /* CARDS */
+  .card { margin:0 12px 2px;padding:14px 18px;border-radius:8px;background:var(--bg-card);border:1px solid var(--border-subtle);cursor:pointer;transition:all .15s;position:relative; }
+  .card:hover{background:var(--bg-card-hover);border-color:var(--border);transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,.3)}
+  .card.red{border-left:3px solid var(--red);background:linear-gradient(90deg,var(--red-soft),var(--bg-card) 40%)}
+  .card.red:hover{box-shadow:0 4px 20px var(--red-glow)}
+  .card.orange{border-left:3px solid var(--orange);background:linear-gradient(90deg,var(--orange-soft),var(--bg-card) 40%)}
+  .card-title{font-size:13px;font-weight:500;color:var(--text-bright);line-height:1.45;margin-bottom:6px}
+  .card-title a{color:inherit;text-decoration:none} .card-title a:hover{text-decoration:underline}
+  .tags{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+  .tag{font-family:var(--mono);font-size:10px;padding:2px 8px;border-radius:4px;background:rgba(255,255,255,.03);border:1px solid var(--border)}
+  .tag.s{color:var(--cyan);border-color:rgba(64,212,208,.2)} .tag.d{color:var(--purple);border-color:rgba(164,128,255,.2)} .tag.sc{color:var(--text-dim)}
+  .card-reason{font-size:11px;color:var(--text-dim);margin-top:5px;line-height:1.5}
+
+  /* SIDEBAR */
+  .sidebar{overflow-y:auto;max-height:calc(100vh - 140px);background:var(--bg)}
+  .sb{padding:22px 24px;border-bottom:1px solid var(--border)}
+  .sb-t{font-family:var(--mono);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:2.5px;color:var(--text-dim);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+  .sb-t .ct{font-weight:400;opacity:.6}
+
+  /* THESIS CARD — the hero */
+  .thesis{padding:20px;border-radius:10px;background:linear-gradient(135deg,rgba(255,64,87,.04),rgba(164,128,255,.04));border:1px solid rgba(255,64,87,.12);margin-bottom:8px}
+  .thesis h3{font-size:14px;font-weight:600;color:var(--text-white);margin-bottom:10px}
+  .thesis-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border-subtle)}
+  .thesis-row:last-child{border-bottom:none}
+  .thesis-entity{font-size:13px;font-weight:500;color:var(--text-bright)}
+  .thesis-en{font-size:11px;color:var(--text-dim);margin-left:4px}
+  .thesis-stat{font-family:var(--mono);font-size:11px;text-align:right}
+  .thesis-mentions{color:var(--cyan)}
+  .thesis-date{color:var(--text-dim);font-size:10px}
+  .thesis-note{font-size:11px;color:var(--text-dim);margin-top:10px;line-height:1.6;font-style:italic}
+
+  /* PORTFOLIO */
+  .port-tier{margin-bottom:14px}
+  .port-label{font-family:var(--mono);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px}
+  .port-label.alpha{color:var(--green)} .port-label.rel{color:var(--cyan)} .port-label.noisy{color:var(--orange)}
+  .src-row{display:grid;grid-template-columns:120px 1fr 40px;align-items:center;gap:10px;margin-bottom:5px}
+  .src-name{font-family:var(--mono);font-size:10px;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .src-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+  .src-fill{height:100%;border-radius:2px;transition:width .5s cubic-bezier(.16,1,.3,1)}
+  .src-pct{font-family:var(--mono);font-size:10px;text-align:right}
+
+  /* CW SIGNALS */
+  .cw-row{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-radius:6px;background:var(--bg-card);border:1px solid var(--border-subtle);margin-bottom:3px;transition:all .15s}
+  .cw-row:hover{background:var(--bg-card-hover);border-color:var(--border)}
+  .cw-zh{font-size:13px;font-weight:600;color:var(--text-bright)}
+  .cw-en{font-size:11px;color:var(--text-dim);margin-left:4px;font-weight:400}
+  .cw-vel{font-family:var(--mono);font-size:11px}
+  .cw-vel.up{color:var(--green)} .cw-vel.down{color:var(--red)} .cw-vel.new{color:var(--orange)}
+
+  /* DOMAIN CARDS */
+  .dom{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-radius:6px;background:var(--bg-card);border:1px solid var(--border-subtle);margin-bottom:3px;cursor:pointer;transition:all .15s}
+  .dom:hover{background:var(--bg-card-hover);border-color:var(--border)}
+  .dom.on{border-color:var(--cyan);background:rgba(64,212,208,.04)}
+  .dom-name{font-size:12px;font-weight:500;color:var(--text-bright)}
+  .dom-info{display:flex;gap:8px;align-items:center;font-family:var(--mono);font-size:10px}
+  .dom-hot{color:var(--orange)}
+  .dom-ct{color:var(--text-dim)}
+
+  /* NOISE GAUGE */
+  .gauge{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:8px;background:var(--bg-card);border:1px solid var(--border-subtle);margin-bottom:10px}
+  .gauge-bar-bg{flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden;position:relative}
+  .gauge-bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--green),var(--cyan))}
+  .gauge-label{font-family:var(--mono);font-size:11px;color:var(--text-dim);white-space:nowrap}
+  .gauge-val{font-family:var(--mono);font-size:18px;font-weight:600;color:var(--green);min-width:50px;text-align:right}
+
+  /* TREND (sparkline-style) */
+  .trend-card{padding:12px 14px;border-radius:8px;background:var(--bg-card);border:1px solid var(--border-subtle);margin-bottom:5px;transition:all .15s}
+  .trend-card:hover{background:var(--bg-card-hover);border-color:var(--border)}
+  .trend-name{font-weight:600;font-size:14px;color:var(--text-white)}
+  .trend-meta{font-family:var(--mono);font-size:10px;color:var(--cyan);margin-top:3px}
+  .trend-badge{font-family:var(--mono);font-size:9px;font-weight:600;padding:2px 8px;border-radius:4px;background:rgba(255,64,87,.1);color:var(--red);letter-spacing:.5px}
+
+  .empty{text-align:center;padding:24px;color:var(--text-dim);font-size:12px}
+  ::-webkit-scrollbar{width:5px} ::-webkit-scrollbar-track{background:transparent} ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="brand-icon">鴉</div>
+    <div><h1>YATAGARASU</h1><p>Signal Intelligence Platform</p></div>
+  </div>
+  <div class="hdr-right"><div class="live"></div><span id="status">connecting...</span></div>
+</header>
+
+<div class="metrics" id="metrics">
+  <div class="m"><div class="m-val" id="m-total">--</div><div class="m-lab">Signals Tracked</div></div>
+  <div class="m"><div class="m-val red" id="m-red">--</div><div class="m-lab">Red / Act Now</div></div>
+  <div class="m"><div class="m-val orange" id="m-orange">--</div><div class="m-lab">Orange / Watch</div></div>
+  <div class="m"><div class="m-val green" id="m-noise">--</div><div class="m-lab">Noise Killed</div></div>
+  <div class="m"><div class="m-val green" id="m-sources">--</div><div class="m-lab">Sources</div></div>
+  <div class="m"><div class="m-val" id="m-domains">7</div><div class="m-lab">Domains</div></div>
+</div>
+
+<div class="main">
+  <!-- FEED: RED + ORANGE only -->
+  <div class="feed">
+    <div class="feed-hdr">
+      <h2>Actionable Signals</h2>
+      <span id="feed-count"></span>
+    </div>
+    <div class="filters" id="filters"></div>
+    <div id="feed"></div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <!-- Crossover Thesis -->
+    <div class="sb">
+      <div class="sb-t">Crossover Thesis · CW Data</div>
+      <div class="thesis">
+        <h3>Chinese signals detected before Western media</h3>
+        <div class="thesis-row">
+          <div><span class="thesis-entity">静奢风</span><span class="thesis-en">Serene Luxury</span></div>
+          <div class="thesis-stat"><div class="thesis-mentions">883 mentions</div><div class="thesis-date">first: Mar 23</div></div>
+        </div>
+        <div class="thesis-row">
+          <div><span class="thesis-entity">松弛感</span><span class="thesis-en">Effortless Vibe</span></div>
+          <div class="thesis-stat"><div class="thesis-mentions">3,579 mentions</div><div class="thesis-date">first: Mar 19</div></div>
+        </div>
+        <div class="thesis-row">
+          <div><span class="thesis-entity">新中式</span><span class="thesis-en">Neo-Chinoiserie</span></div>
+          <div class="thesis-stat"><div class="thesis-mentions">3,148 mentions</div><div class="thesis-date">first: Mar 23</div></div>
+        </div>
+        <div class="thesis-row">
+          <div><span class="thesis-entity">氛围感</span><span class="thesis-en">Ambiance Aesthetic</span></div>
+          <div class="thesis-stat"><div class="thesis-mentions">9,299 mentions</div><div class="thesis-date">first: Mar 21</div></div>
+        </div>
+        <div class="thesis-note">12,315 posts from XHS + Bilibili. 40,640 entity extractions. These signals appeared on Chinese social media weeks before Western coverage. The temporal lag is the alpha.</div>
+      </div>
+    </div>
+
+    <!-- CW Entity Velocity -->
+    <div class="sb" id="cw-section" style="display:none">
+      <div class="sb-t">CW Entity Velocity · This Week</div>
+      <div id="cw-intel"></div>
+    </div>
+
+    <!-- Noise Gauge -->
+    <div class="sb">
+      <div class="sb-t">Signal Efficiency</div>
+      <div class="gauge">
+        <div class="gauge-label">Noise killed</div>
+        <div class="gauge-bar-bg"><div class="gauge-bar-fill" id="gauge-fill" style="width:0%"></div></div>
+        <div class="gauge-val" id="gauge-val">--</div>
+      </div>
+      <div id="hottest-domain" style="font-family:var(--mono);font-size:10px;color:var(--text-dim);padding-left:2px"></div>
+    </div>
+
+    <!-- Trending -->
+    <div class="sb">
+      <div class="sb-t">Trending <span class="ct" id="trend-ct"></span></div>
+      <div id="trending"></div>
+    </div>
+
+    <!-- Source Portfolio -->
+    <div class="sb">
+      <div class="sb-t">Source Portfolio</div>
+      <div id="sources"></div>
+    </div>
+
+    <!-- Domains -->
+    <div class="sb">
+      <div class="sb-t">Active Domains</div>
+      <div id="domains"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API='';
+let activeDomain=null, digestData=null;
+
+async function api(p){return(await fetch(API+p)).json()}
+function esc(s){if(!s)return'';const d=document.createElement('div');d.textContent=s;return d.innerHTML}
+
+async function loadStats(){
+  const d=await api('/api/stats');
+  document.getElementById('m-total').textContent=d.total_items.toLocaleString();
+  document.getElementById('m-red').textContent=d.tier_counts.RED||0;
+  document.getElementById('m-orange').textContent=d.tier_counts.ORANGE||0;
+  if(d.last_digest){document.getElementById('status').textContent='last sweep '+d.last_digest.timestamp.replace('T',' ').slice(0,16)}
+}
+
+async function loadFeed(){
+  digestData=await api('/api/digest?limit=80&hours=72');
+  // Noise gauge
+  const nk=digestData.noise_kill_rate||0;
+  document.getElementById('gauge-fill').style.width=Math.round(nk*100)+'%';
+  document.getElementById('gauge-val').textContent=Math.round(nk*100)+'%';
+  document.getElementById('m-noise').textContent=Math.round(nk*100)+'%';
+  const hd=digestData.hottest_domain;
+  if(hd)document.getElementById('hottest-domain').textContent='Hottest: '+hd.replace(/_/g,' ');
+  renderFeed();
+}
+
+function renderFeed(){
+  const c=document.getElementById('feed');
+  let html='',shown=0;
+  // Only RED + ORANGE — no yellow noise
+  for(const tier of['RED','ORANGE']){
+    let items=digestData.tiers[tier]||[];
+    if(activeDomain)items=items.filter(i=>i.domain===activeDomain);
+    if(!items.length)continue;
+    const t=tier.toLowerCase();
+    html+=`<div class="tbadge ${t}">${tier} · ${items.length}</div>`;
+    for(const item of items){
+      const src=item.source?`<span class="tag s">${esc(item.source.replace(/^rss:/,''))}</span>`:'';
+      const dom=item.domain?`<span class="tag d">${esc(item.domain.replace(/_/g,' '))}</span>`:'';
+      const sc=item.llm_score?`<span class="tag sc">${item.llm_score}/5</span>`:'';
+      const reason=item.llm_reason?`<div class="card-reason">${esc(item.llm_reason)}</div>`:'';
+      html+=`<div class="card ${t}" onclick="window.open('${esc(item.url)}','_blank')">
+        <div class="card-title"><a href="${esc(item.url)}" target="_blank" onclick="event.stopPropagation()">${esc(item.title)}</a></div>
+        <div class="tags">${src}${dom}${sc}</div>${reason}</div>`;
+      shown++;
+    }
+  }
+  if(!html)html='<div class="empty">No actionable signals in window</div>';
+  c.innerHTML=html;
+  document.getElementById('feed-count').textContent=shown+' actionable';
+}
+
+async function loadSources(){
+  const d=await api('/api/sources');
+  document.getElementById('m-sources').textContent=d.total_sources;
+  const c=document.getElementById('sources');
+  const p=d.portfolio;
+  let html='';
+
+  function renderTier(label,cls,items){
+    if(!items.length)return'';
+    let h=`<div class="port-tier"><div class="port-label ${cls}">${label} (${items.length})</div>`;
+    for(const s of items.slice(0,6)){
+      const rate=s.signal_rate||0;
+      const pct=Math.round(rate*100);
+      const color=rate>=.4?'var(--green)':rate>=.15?'var(--cyan)':'var(--orange)';
+      const name=s.source.replace(/^rss:/,'').replace(/^competitor:/,'').replace(/^bluesky:/,'');
+      h+=`<div class="src-row"><span class="src-name" title="${esc(s.source)}">${esc(name)}</span><div class="src-bar"><div class="src-fill" style="width:${pct}%;background:${color}"></div></div><span class="src-pct" style="color:${color}">${pct}%</span></div>`;
+    }
+    h+='</div>';return h;
+  }
+  html+=renderTier('Alpha Generators','alpha',p.alpha_generators);
+  html+=renderTier('Reliable','rel',p.reliable);
+  if(p.noisy.length)html+=`<div class="port-tier"><div class="port-label noisy">Noisy (${p.noisy.length} sources, signal rate <15%)</div></div>`;
+  c.innerHTML=html||'<div class="empty">No data yet</div>';
+}
+
+async function loadTrending(){
+  const d=await api('/api/trending?hours=72');
+  const c=document.getElementById('trending');
+  document.getElementById('trend-ct').textContent=d.total?'· '+d.total:'';
+  if(!d.trending?.length){c.innerHTML='<div class="empty">No breakout signals</div>';return}
+  let html='';
+  for(const t of d.trending){
+    const srcs=t.sources.split(',').map(s=>`<span class="tag s">${esc(s.trim())}</span>`).join(' ');
+    html+=`<div class="trend-card"><div style="display:flex;justify-content:space-between;align-items:center"><div class="trend-name">${esc(t.entity)}</div><div class="trend-badge">${t.source_count} SOURCES</div></div><div class="trend-meta">${srcs}</div></div>`;
+  }
+  c.innerHTML=html;
+}
+
+async function loadDomains(){
+  const d=await api('/api/domains');
+  document.getElementById('m-domains').textContent=d.total_domains;
+  const c=document.getElementById('domains');
+  const f=document.getElementById('filters');
+  let fh=`<button class="fb ${!activeDomain?'on':''}" onclick="setDomain(null)">All</button>`;
+  let dh='';
+  const sorted=Object.entries(d.domains).sort((a,b)=>b[1].total_items-a[1].total_items);
+  for(const[name,info]of sorted){
+    const label=name.replace(/_/g,' ');
+    const r=info.tier_breakdown.RED||0;
+    const o=info.tier_breakdown.ORANGE||0;
+    fh+=`<button class="fb ${activeDomain===name?'on':''}" onclick="setDomain('${name}')">${label}</button>`;
+    dh+=`<div class="dom ${activeDomain===name?'on':''}" onclick="setDomain('${name}')"><span class="dom-name">${label}</span><div class="dom-info">${r+o?`<span class="dom-hot">${r}R ${o}O</span>`:''}  <span class="dom-ct">${info.total_items}</span></div></div>`;
+  }
+  f.innerHTML=fh;c.innerHTML=dh;
+}
+
+async function loadCW(){
+  try{
+    const d=await api('/api/items?source=cw_bridge&limit=50&hours=168');
+    const items=d.items||[];
+    const sec=document.getElementById('cw-section');
+    const c=document.getElementById('cw-intel');
+    if(!items.length){sec.style.display='none';return}
+    sec.style.display='block';
+    let html='';
+    for(const item of items.slice(0,8)){
+      const m=item.title.match(/\[CW \w+\]\s+(.+?):\s+(\d+)\s+mentions.*?\((.*?)\s+vs/);
+      if(!m)continue;
+      const entity=m[1],mentions=m[2],vel=m[3];
+      const isUp=vel.startsWith('+')||vel==='NEW';
+      const cls=vel==='NEW'?'new':isUp?'up':'down';
+      const enM=entity.match(/\((.+?)\)/);
+      const zh=entity.replace(/\s*\(.+?\)/,'');
+      const en=enM?enM[1]:'';
+      html+=`<div class="cw-row"><div><span class="cw-zh">${esc(zh)}</span>${en?`<span class="cw-en">${esc(en)}</span>`:''}</div><div class="cw-vel ${cls}">${mentions}/wk ${vel}</div></div>`;
+    }
+    c.innerHTML=html||'<div class="empty">No CW signals</div>';
+  }catch(e){document.getElementById('cw-section').style.display='none'}
+}
+
+function setDomain(d){activeDomain=d;renderFeed();loadDomains()}
+
+async function init(){
+  try{await Promise.all([loadStats(),loadFeed(),loadSources(),loadTrending(),loadDomains(),loadCW()])}
+  catch(e){console.error(e);document.getElementById('status').textContent='connection failed'}
+}
+init();
+setInterval(init,300000);
+</script>
+</body>
+</html>
