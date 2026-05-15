@@ -238,9 +238,6 @@ sources:
     enabled: true
     feeds:
       # -- VC / Founder --
-      - name: "a16z Future"
-        url: "https://future.com/feed"
-        domain: "founder_vc"
       - name: "YC Blog"
         url: "https://www.ycombinator.com/blog/feed/"
         domain: "founder_vc"
@@ -278,9 +275,6 @@ sources:
         domain: "ai_applied"
 
       # -- Fashion / Market --
-      - name: "The Fashion Law"
-        url: "https://www.thefashionlaw.com/feed/"
-        domain: "jp_fashion_market"
       - name: "Highsnobiety"
         url: "https://www.highsnobiety.com/feed/"
         domain: "jp_fashion_market"
@@ -295,9 +289,6 @@ sources:
       - name: "Sinocism (Bill Bishop)"
         url: "https://sinocism.com/feed"
         domain: "chinese_consumer"
-      - name: "SupChina / The China Project"
-        url: "https://thechinaproject.com/feed/"
-        domain: "chinese_consumer"
       - name: "What's on Weibo"
         url: "https://www.whatsonweibo.com/feed/"
         domain: "chinese_consumer"
@@ -309,9 +300,6 @@ sources:
         domain: "chinese_consumer"
 
       # -- Systems / Infra / Quant --
-      - name: "Martin Kleppmann"
-        url: "https://martin.kleppmann.com/atom.xml"
-        domain: "systems_infra"
       - name: "The Pragmatic Engineer"
         url: "https://blog.pragmaticengineer.com/rss/"
         domain: "systems_infra"
